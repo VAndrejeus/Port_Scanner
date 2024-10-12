@@ -2,6 +2,7 @@ import socket
 import pandas as pd  # Using pandas to work with external csv file that has all port descriptions
 import tkinter as tk
 
+
 # Function that opens up the ports.csv file, load up and returns the description of the ports
 def port_description(port):
     port_csv = pd.read_csv("Ports.csv")
@@ -13,18 +14,16 @@ def port_description(port):
 
 
 # Main port scanning function that uses connect_ex for exception handling
-def ports_scan(ip, port_start, port_end):
-    print(f"Starting port scan on {ip} with ranges {port_start}-{port_end}...")
-    for port in range(port_start, port_end):
+def ports_scan(ip, port_st, port_en):
+    print(f"Starting port scan on {ip} with ranges {port_start.get()}-{port_end.get()}...")
+    for port in range(port_st, port_en):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(0.01)  #   Set time out for faster processing
         try_connect = s.connect_ex((ip, port))
         if try_connect == 0:  #   Connection to a port succeeded
             print(f" Port {port}: {port_description(port)} is open...")
             s.close()
-
-
-
+    print("Scan complete")
 
 
 # Create main GUI window
@@ -47,31 +46,26 @@ port_e_label.grid(row=2, column=1)
 ip_entry = tk.Entry(main_frame)
 ip_entry.insert(0, "0.0.0.0")
 ip_entry.grid(row=1, column=0, columnspan=2)
-port_s_entry = tk.Entry(main_frame, width=5,)
-port_s_entry.insert(0, "0")
+
+# Variables to hold port entry values
+port_start = tk.IntVar()
+port_end = tk.IntVar()
+
+port_s_entry = tk.Entry(main_frame, width=5,textvariable=port_start)
 port_s_entry.grid(row=3, column=0)
-port_e_entry = tk.Entry(main_frame, width=5)
-port_e_entry.insert(0, "0")
+port_e_entry = tk.Entry(main_frame, width=5, textvariable=port_end)
 port_e_entry.grid(row=3, column=1)
 
 # Buttons
-scan_button = tk.Button(main_frame, text="Start Scan", command=lambda: ports_scan(target_ip, port_s, port_e))
+scan_button = tk.Button(main_frame, text="Start Scan", command=lambda: ports_scan(ip_entry.get(),
+                                                                                  port_start.get(),
+                                                                                  port_end.get()))
 scan_button.grid(row=4, column=0, columnspan=2)
 
 # Multi-line text box
 result_text = tk.Text(main_frame, width=18, height=15)
 result_text.grid(row=5, column=0, columnspan=2)
 
-
-
-
-# Get info from GUI fields
-def get_scan_info():
-    target_ip = ip_entry.get()
-    port_s = port_s_entry.get()
-    port_s = int(port_s)
-    port_e = port_e_entry.get()
-    port_e = int(port_e)
 
 
 
